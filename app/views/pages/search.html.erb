@@ -1,0 +1,139 @@
+<div class="search container">
+    <div class="row page-header">
+    <h1>Search</h1>
+    </div>
+
+    <% if @no_results_found %>
+    <div class="row">
+        <div class="alert alert-danger">Sorry, we couldn't find a gene matching that symbol.</div>
+        <a class="btn btn-default" href="/"><i class="glyphicon glyphicon-arrow-left"></i> New Search</a>
+    </div>
+    <% else %>
+    <div class="row">
+
+    <p class="lead">Symbol: <%= @gene.symbol %></p>
+    <p class="lead">Full Name: <%= @gene.full_name %></p>
+    <p class="lead">Date Identified: <%= @gene.date_identified.strftime("%Y %b %d") %></p>
+
+    <p class="lead">Nucleotide Sequence:</p>
+
+    <% if @gene.fasta_file %>
+
+<pre class="sequence">
+<%= @gene.sequence %>
+</pre>
+
+    <a class="pull-right" href="/fasta?symbol=<%= @gene.symbol %>"><i class="glyphicon glyphicon-cloud-download"></i> Download FASTA File</a><br><br>
+
+    <% end %>
+
+    </div>
+
+    <% if @publications %>
+    <div class="row">
+        <p class="lead">Publications containing references to <%= @gene.symbol %>:</p>
+
+        <div class="well well-lg">
+
+        <ul style="margin: 0" class="pagination">
+          <li class="disabled"><a data-retstart="0" class="paginator backward" href="javascript:void(0)">&laquo;</a></li>
+          <li><a data-retstart="4" class="paginator forward" href="javascript:void(0)">&raquo;</a></li>
+        </ul>
+
+        <ul class="list-group">
+            <% @publications[:pubs].each do |pub| %>
+            <li class="list-group-item">
+            <p><strong>Title:</strong> <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/?term=<%= pub[:title] %>"><%= pub[:title] %></a></p>
+            <p><strong>Authors:</strong> <%= pub[:authors] %></p>
+            <p><strong>Publication Date:</strong> <%= pub[:pubdate] %></p>
+            </li>
+            <% end %>
+        </ul>
+
+        </div>
+    </div>
+    <% end %>
+
+    <div class="row">
+        <a class="btn btn-default" href="/"><i class="glyphicon glyphicon-arrow-left"></i> New Search</a>
+    </div>
+
+    <% end %>
+
+</div>
+
+<% if @publications %>
+<script>
+var pub_count = <%= @publications[:count] %>;
+
+$('.paginator').on('click',function(){
+
+var current_paginator = $(this);
+
+if(!current_paginator.parent().hasClass('disabled')){
+    // disable pagination while data is requested
+    $('.paginator').parent().addClass('disabled');
+
+    $('.list-group').html('<div style="text-align: center"><img src="assets/ajax_loader_gray_128.gif" /></div>');
+
+    var retstart = Math.max(0, parseInt(current_paginator.attr('data-retstart')));
+    $.post('/publications', { gene_symbol: "<%= @gene.symbol %>", retstart: retstart}, 
+        function(data){
+
+        $('.paginator').parent().removeClass('disabled');
+
+        var ul_content = [];
+        for(var i in data.publications['pubs']){
+
+            var li_content = [
+                '<p><strong>Title:</strong> <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/?term=' + data.publications['pubs'][i].title + '">' + data.publications['pubs'][i].title + '</a></p>', 
+                '<p><strong>Authors:</strong> ' + data.publications['pubs'][i].authors + '</p>',
+                '<p><strong>Publication Date:</strong> ' + data.publications['pubs'][i].pubdate + '</p>'
+            ].join('');
+
+            ul_content.push('<li class="list-group-item">' +  li_content + '</li>')
+        }
+
+        $('.list-group').html(ul_content.join(''));
+
+        if(current_paginator.hasClass('forward')){
+            if(retstart + 4 < pub_count){
+
+                $('.backward').attr('data-retstart', function(){
+                    return Math.max(0, parseInt($('.forward').attr('data-retstart')) - 4);
+                });
+
+                $('.forward').attr('data-retstart', function(){
+                    return parseInt($('.forward').attr('data-retstart')) + 4;
+                });
+            }
+            else {
+                current_paginator.parent().addClass('disabled');
+            }
+        }
+        else if(current_paginator.hasClass('backward')){
+
+            if(retstart >= 0){
+                $('.forward').attr('data-retstart', function(){
+                    return parseInt($('.backward').attr('data-retstart')) + 4;
+                });
+                
+                $('.backward').attr('data-retstart', function(){
+                    return Math.max(0, parseInt($('.backward').attr('data-retstart')) - 4);
+                });
+
+                if(retstart == 0){
+                    current_paginator.parent().addClass('disabled');
+                }
+            }
+            else {
+                current_paginator.parent().addClass('disabled');
+            }
+        }
+
+    });
+}
+
+});
+</script>
+<% end %>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GeneWise</title>
+  <%= stylesheet_link_tag    'application', '//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.css', 'http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+<%= yield %>
+
+<div id="footer">
+  <div class="container">
+    <p class="text-muted">2014 Matt Meyer</p>
+  </div>
+</div>
+</body>
+</html>

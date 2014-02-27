@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  symbol: MyString
+  full_name: MyString
+  date_identified: 2014-02-24 08:07:54
+
+two:
+  symbol: MyString
+  full_name: MyString
+  date_identified: 2014-02-24 08:07:54
