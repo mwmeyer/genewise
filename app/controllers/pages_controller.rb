@@ -93,6 +93,11 @@ class PagesController < ApplicationController
 
   def search
 
+    if params[:q].nil?
+      @no_results_found = true
+      return
+    end 
+
     @gene = Gene.find_by symbol: params[:q]
 
     if @gene.nil?
