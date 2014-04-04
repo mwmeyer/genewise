@@ -1,0 +1,27 @@
+<div class="container">
+
+    <div class="row page-header">
+    <h1>Log In To Your Account</h1>
+    </div>
+
+    <div class="row">
+
+    <% if flash[:error] %>
+    <div class="alert alert-danger">
+      <p><%= flash[:error] %></p>
+    </div>
+    <% end %>
+
+    <%= form_tag("/login", method: "post", class: "form") do %>
+      <div class="form-group">
+      <%= text_field_tag 'email', nil, placeholder: 'email', class: 'form-control input-lg', :required => true %>
+      </div>
+      <div class="form-group">
+      <%= text_field_tag 'password', nil, placeholder: 'password', class: 'form-control input-lg', :required => true, :type => 'password' %>
+      </div>
+      <p class="pull-right">Need an account? Sign up <a href="/signup">here</a></p>
+      <%= submit_tag("Log In", class: "btn btn-success btn-lg") %>
+    <% end %>
+    </div>
+
+</div>
